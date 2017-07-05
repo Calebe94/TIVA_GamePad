@@ -20,58 +20,26 @@ void setup(){
     PortB_Interrupt();
 }
 
-void SysTick_Handler(void){
+void SysTick_Handler(){
+    char keys[8];
 
-    char action[] = "S: ;A: ;B: ;X: ;Y: ;AL: ;AR: ;";
-    char directional[] = "U: ;D: ;R: ;L: ;";
-    char dualshock[] = "AX:    ;AY:    ;\n";
+    uint8_t x_value = Joystick_Map(ADC_Read(X_AIN), 0, 4095, 0, 100);
+    uint8_t y_value = Joystick_Map(ADC_Read(Y_AIN), 0, 4095, 0, 100);
 
-    action[2] = (char)48|PAUSE;
-    action[6] = (char)48|ACT_A;
-    action[10]= (char)48|ACT_B;
-    action[14]= (char)48|ACT_X;
-    action[18]= (char)48|ACT_Y;
-    action[23]= (char)48|ACT_L;
-    action[28]= (char)48|ACT_R;
+    keys[0] = (char)(0b01000000)|(PAUSE<<4)|(ACT_A<<3)|(ACT_B<<2)|(ACT_X<<1)|(ACT_Y<<0);
+    keys[1] = (char)(0b01000000)|(D_UP<<5|D_DOWN<<4|D_LEFT<<3|D_RIGHT<<2|ACT_R<<1|ACT_L<<0);
 
-    directional[2] = (char)48|D_UP;
-    directional[6] = (char)48|D_DOWN;
-    directional[10] =(char)48|D_RIGHT;
-    directional[14] =(char)48|D_LEFT;
+    keys[2] = (char)(0b01000000)|(x_value&0b1111);
+    keys[3] = (char)(0b01000000)|((x_value&0b11110000)>>4);
 
-    uint8_t milhar,centena,dezena,unidade;
-    uint16_t x_value = Joystick_Map(ADC_Read(X_AIN), 0, 4095, 0, 100);
-    uint16_t y_value = Joystick_Map(ADC_Read(Y_AIN), 0, 4095, 0, 100);
+    keys[4] = (char)(0b01000000)|(y_value&0b1111);
+    keys[5] = (char)(0b01000000)|((y_value&0b11110000)>>4);
 
-    // X axis value conversion
-    milhar =(uint8_t)(x_value/1000);
-    centena=(uint8_t)(x_value-(milhar*1000))/100;
-    dezena =(uint8_t)(x_value-(milhar*1000)-(centena*100))/10;
-    unidade=(uint8_t)(x_value-(milhar*1000)-(centena*100)-(dezena*10));
+    keys[6] = (char)'\n';
+    keys[7] = (char)'\0';
 
-    dualshock[3] = (char)48|milhar;
-    dualshock[4] = (char)48|centena;
-    dualshock[5] = (char)48|dezena;
-    dualshock[6] = (char)48|unidade;
-
-    // Y axis value conversion
-    milhar =(uint8_t)(y_value/1000);
-    centena=(uint8_t)(y_value-(milhar*1000))/100;
-    dezena =(uint8_t)(y_value-(milhar*1000)-(centena*100))/10;
-    unidade=(uint8_t)(y_value-(milhar*1000)-(centena*100)-(dezena*10));
-
-    dualshock[11] = (char)48|milhar;
-    dualshock[12] = (char)48|centena;
-    dualshock[13] = (char)48|dezena;
-    dualshock[14] = (char)48|unidade;
-
-    print(&USB, action);
-    print(&USB, directional);
-    print(&USB, dualshock);
-
-    print(&BT, action);
-    print(&BT, directional);
-    print(&BT, dualshock);
+    print(&BT,keys);
+    print(&USB,keys);
 }
 
 void Start_Handler(){
@@ -82,7 +50,6 @@ void Start_Handler(){
 int main(void) {
     setup();
 
-    //USB = USB_begin(19200);
     USB = USB_begin(9600);
     BT  = Bluetooth_begin(9600);
 

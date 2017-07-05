@@ -10,7 +10,6 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./ADC.obj" \
 "./UART.obj" \
-"./gamepad.obj" \
 "./main.obj" \
 "./system.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
@@ -156,8 +155,8 @@ GAMEPad.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "ADC.obj" "UART.obj" "gamepad.obj" "main.obj" "system.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "ADC.d" "UART.d" "gamepad.d" "main.d" "system.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "ADC.obj" "UART.obj" "main.obj" "system.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "ADC.d" "UART.d" "main.d" "system.d" "tm4c123gh6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
